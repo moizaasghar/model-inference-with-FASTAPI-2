@@ -3,6 +3,10 @@
 *.py[cod]
 *$py.class
 
+azure-cli.msi
+
+nul
+
 # C extensions
 *.so
 
@@ -131,3 +135,4 @@ logs/
 
 
 backend/model
+GITHUB_SECRETS.txt
