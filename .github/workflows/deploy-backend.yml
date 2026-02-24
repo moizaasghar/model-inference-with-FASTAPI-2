@@ -29,21 +29,21 @@ jobs:
         uses: azure/login@v2
         with:
           creds: ${{ secrets.AZURE_CREDENTIALS }}
-
-      - name: Log in to Azure Container Registry
+      
+      - name: Log in to ACR
         uses: azure/docker-login@v2
         with:
           login-server: ${{ secrets.ACR_NAME }}.azurecr.io
           username: ${{ secrets.ACR_USERNAME }}
           password: ${{ secrets.ACR_PASSWORD }}
-
+      
       - name: Build and push Docker image
         run: |
           cd backend
           docker build -t ${{ secrets.ACR_NAME }}.azurecr.io/${{ env.IMAGE_NAME }}:${{ github.sha }} .
           docker build -t ${{ secrets.ACR_NAME }}.azurecr.io/${{ env.IMAGE_NAME }}:latest .
           docker push ${{ secrets.ACR_NAME }}.azurecr.io/${{ env.IMAGE_NAME }}:${{ github.sha }}
-          docker push ${{ secrets.ACR_NAME }}.azurecr.io/${{ env.IMAGE_NAME }}:latest
+          docker push ${{ secrets.ACR_NAME }}.azurecr.io/${{ env.IMAGE_NAME }}:latest 
 
       - name: Deploy to Azure Container Apps
         run: |
@@ -62,12 +62,8 @@ jobs:
             az containerapp create \
               --name ${{ env.CONTAINER_APP_NAME }} \
               --resource-group ${{ secrets.AZURE_RESOURCE_GROUP }} \
-              --environment ${{ secrets.CONTAINER_APP_ENVIRONMENT }} \
               --image ${{ secrets.ACR_NAME }}.azurecr.io/${{ env.IMAGE_NAME }}:${{ github.sha }} \
+              --environment ${{ secrets.CONTAINER_APP_ENVIRONMENT }} \
+              --ingress 'external' \
               --target-port 8000 \
-              --ingress external \
-              --registry-server ${{ secrets.ACR_NAME }}.azurecr.io \
-              --registry-username ${{ secrets.ACR_USERNAME }} \
-              --registry-password ${{ secrets.ACR_PASSWORD }} \
-              --env-vars WANDB_API_KEY=${{ secrets.WANDB_API_KEY }} MODEL_NAME=${{ env.MODEL_NAME }} VERSION=${{ env.MODEL_VERSION }}
-          fi
+              --set-env-vars WANDB_API_KEY=${{ secrets.WANDB_API_KEY }} MODEL_NAME=${{ env.MODEL_NAME }} VERSION=${{ env.MODEL_VERSION }}
