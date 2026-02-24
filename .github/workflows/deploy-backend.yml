@@ -14,6 +14,8 @@ env:
   CONTAINER_APP_NAME: sentiment-backend
   RESOURCE_GROUP: ${{ secrets.AZURE_RESOURCE_GROUP }}
   IMAGE_NAME: sentiment-backend
+  MODEL_NAME: moizasghar-afiniti-org/wandb-registry-model/17-2-26-bert-tiny-sentiment
+  MODEL_VERSION: v1
 
 jobs:
   build-and-deploy:
@@ -54,7 +56,7 @@ jobs:
               --name ${{ env.CONTAINER_APP_NAME }} \
               --resource-group ${{ secrets.AZURE_RESOURCE_GROUP }} \
               --image ${{ secrets.ACR_NAME }}.azurecr.io/${{ env.IMAGE_NAME }}:${{ github.sha }} \
-              --set-env-vars WANDB_API_KEY=${{ secrets.WANDB_API_KEY }} MODEL_NAME=${{ secrets.MODEL_NAME }} VERSION=${{ secrets.MODEL_VERSION }}
+              --set-env-vars WANDB_API_KEY=${{ secrets.WANDB_API_KEY }} MODEL_NAME=${{ env.MODEL_NAME }} VERSION=${{ env.MODEL_VERSION }}
           else
             # Create new container app
             az containerapp create \
@@ -67,5 +69,5 @@ jobs:
               --registry-server ${{ secrets.ACR_NAME }}.azurecr.io \
               --registry-username ${{ secrets.ACR_USERNAME }} \
               --registry-password ${{ secrets.ACR_PASSWORD }} \
-              --env-vars WANDB_API_KEY=${{ secrets.WANDB_API_KEY }} MODEL_NAME=${{ secrets.MODEL_NAME }} VERSION=${{ secrets.MODEL_VERSION }}
+              --env-vars WANDB_API_KEY=${{ secrets.WANDB_API_KEY }} MODEL_NAME=${{ env.MODEL_NAME }} VERSION=${{ env.MODEL_VERSION }}
           fi
