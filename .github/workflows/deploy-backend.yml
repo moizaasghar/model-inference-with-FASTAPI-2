@@ -53,7 +53,8 @@ jobs:
             az containerapp update \
               --name ${{ env.CONTAINER_APP_NAME }} \
               --resource-group ${{ secrets.AZURE_RESOURCE_GROUP }} \
-              --image ${{ secrets.ACR_NAME }}.azurecr.io/${{ env.IMAGE_NAME }}:${{ github.sha }}
+              --image ${{ secrets.ACR_NAME }}.azurecr.io/${{ env.IMAGE_NAME }}:${{ github.sha }} \
+              --set-env-vars WANDB_API_KEY=${{ secrets.WANDB_API_KEY }} MODEL_NAME=${{ secrets.MODEL_NAME }} VERSION=${{ secrets.MODEL_VERSION }}
           else
             # Create new container app
             az containerapp create \
@@ -65,5 +66,6 @@ jobs:
               --ingress external \
               --registry-server ${{ secrets.ACR_NAME }}.azurecr.io \
               --registry-username ${{ secrets.ACR_USERNAME }} \
-              --registry-password ${{ secrets.ACR_PASSWORD }}
+              --registry-password ${{ secrets.ACR_PASSWORD }} \
+              --env-vars WANDB_API_KEY=${{ secrets.WANDB_API_KEY }} MODEL_NAME=${{ secrets.MODEL_NAME }} VERSION=${{ secrets.MODEL_VERSION }}
           fi
