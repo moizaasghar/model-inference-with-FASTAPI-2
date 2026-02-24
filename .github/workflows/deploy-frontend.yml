@@ -14,6 +14,7 @@ env:
   CONTAINER_APP_NAME: sentiment-frontend
   RESOURCE_GROUP: ${{ secrets.AZURE_RESOURCE_GROUP }}
   IMAGE_NAME: sentiment-frontend
+  API_BASE_URL: https://sentiment-backend.redwave-90d5a156.centralindia.azurecontainerapps.io
 
 jobs:
   build-and-deploy:
@@ -54,7 +55,7 @@ jobs:
               --name ${{ env.CONTAINER_APP_NAME }} \
               --resource-group ${{ secrets.AZURE_RESOURCE_GROUP }} \
               --image ${{ secrets.ACR_NAME }}.azurecr.io/${{ env.IMAGE_NAME }}:${{ github.sha }} \
-              --set-env-vars API_BASE_URL=${{ secrets.API_BASE_URL }}
+              --set-env-vars API_BASE_URL=${{ env.API_BASE_URL }}
           else
             # Create new container app
             az containerapp create \
@@ -67,5 +68,5 @@ jobs:
               --registry-server ${{ secrets.ACR_NAME }}.azurecr.io \
               --registry-username ${{ secrets.ACR_USERNAME }} \
               --registry-password ${{ secrets.ACR_PASSWORD }} \
-              --env-vars API_BASE_URL=${{ secrets.API_BASE_URL }}
+              --env-vars API_BASE_URL=${{ env.API_BASE_URL }}
           fi
